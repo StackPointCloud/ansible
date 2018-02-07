@@ -36,6 +36,7 @@ class OneAndOneResources:
     server = 'server'
     user = 'user'
     vpn = 'vpn'
+    block_storage = 'block_storage'
 
 
 def get_resource(oneandone_conn, resource_type, resource_id):
@@ -49,6 +50,7 @@ def get_resource(oneandone_conn, resource_type, resource_id):
         'server': oneandone_conn.get_server,
         'user': oneandone_conn.get_user,
         'vpn': oneandone_conn.get_vpn,
+        'block_storage': oneandone_conn.get_block_storage,
     }
 
     return switcher.get(resource_type, None)(resource_id)
@@ -202,6 +204,18 @@ def get_public_ip(oneandone_conn, public_ip, full_object=False):
             if full_object:
                 return _public_ip
             return _public_ip['id']
+
+
+def get_block_storage(oneandone_conn, block_storage, full_object=False):
+    """
+    Validates that the block storage exists by ID or a name.
+    Returns the block storage if one was found.
+    """
+    for _block_storage in oneandone_conn.list_block_storages(per_page=1000):
+        if block_storage in (_block_storage['id'], _block_storage['name']):
+            if full_object:
+                return _block_storage
+            return _block_storage['id']
 
 
 def wait_for_resource_creation_completion(oneandone_conn,
